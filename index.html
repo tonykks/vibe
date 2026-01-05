@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vibe Coding — 5일 완성 프로젝트</title>
+  <meta name="description" content="AI와 함께 만드는 Vibe Coding. 5일 동안 작은 제품을 설계·구현·배포까지." />
+  <style>
+    :root{
+      --bg: #ffffff;
+      --text: #0b0f14;
+      --muted: rgba(11,15,20,.68);
+      --hairline: rgba(11,15,20,.10);
+      --card: rgba(11,15,20,.03);
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+      --radius: 22px;
+      --max: 1120px;
+      --accent: #0071e3; /* Apple-ish blue */
+      --accent2: #0a84ff;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text",
+                   "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, Arial, sans-serif;
+      letter-spacing: -0.02em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 0 20px; }
+    .nav{
+      position: sticky; top:0; z-index: 50;
+      backdrop-filter: blur(18px);
+      background: rgba(255,255,255,.78);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .nav-in{
+      display:flex; align-items:center; justify-content:space-between;
+      height: 56px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:650;
+    }
+    .logo{
+      width:22px; height:22px; border-radius:8px;
+      background: radial-gradient(90% 90% at 20% 20%, #cfe7ff 0%, #7bb7ff 35%, #2a7fff 65%, #0b5bd3 100%);
+      box-shadow: 0 8px 22px rgba(0,113,227,.25);
+    }
+    .nav-links{ display:flex; gap:16px; align-items:center; color: var(--muted); font-size: 14px; }
+    .nav-links a{ padding:8px 10px; border-radius: 12px; }
+    .nav-links a:hover{ background: rgba(0,0,0,.04); color: rgba(11,15,20,.85); }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      height: 42px; padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.7);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      font-weight:600;
+      white-space: nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(0,0,0,.02); border-color: rgba(0,0,0,.16); }
+    .btn.primary{
+      background: linear-gradient(180deg, var(--accent2), var(--accent));
+      border-color: rgba(0,113,227,.55);
+      color:white;
+      box-shadow: 0 12px 26px rgba(0,113,227,.25);
+    }
+    .btn.primary:hover{ transform: translateY(-1px); }
+
+    .hero{
+      padding: 54px 0 26px;
+    }
+    .kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      font-size: 13px; color: rgba(11,15,20,.72);
+      padding: 8px 12px; border-radius: 999px;
+      border: 1px solid var(--hairline);
+      background: rgba(11,15,20,.02);
+    }
+    .kdot{
+      width: 8px; height: 8px; border-radius: 99px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(0,113,227,.18);
+    }
+    h1{
+      font-size: clamp(34px, 4.3vw, 62px);
+      line-height: 1.05;
+      margin: 18px 0 12px;
+      letter-spacing: -0.04em;
+    }
+    .sub{
+      font-size: clamp(16px, 1.4vw, 20px);
+      color: var(--muted);
+      max-width: 64ch;
+      line-height: 1.55;
+      margin: 0 0 22px;
+    }
+    .hero-cta{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .meta{ display:flex; gap:14px; flex-wrap:wrap; color: rgba(11,15,20,.62); font-size: 14px; margin-top: 18px; }
+    .meta span{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px; border-radius: 999px;
+      background: rgba(0,0,0,.03);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+    .icon{
+      width: 16px; height: 16px; display:inline-block;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 26px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+      .nav-links{ display:none; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border: 1px solid var(--hairline);
+      background: linear-gradient(180deg, rgba(11,15,20,.03), rgba(11,15,20,.015));
+      box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+      padding: 18px;
+      overflow:hidden;
+      position: relative;
+    }
+    .card h3{ margin: 0 0 8px; letter-spacing: -0.02em; }
+    .card p{ margin: 0; color: var(--muted); line-height: 1.6; }
+    .card .pillrow{
+      display:flex; flex-wrap:wrap; gap:8px; margin-top: 14px;
+    }
+    .pill{
+      font-size: 12px; color: rgba(11,15,20,.72);
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.6);
+    }
+
+    .device{
+      border-radius: var(--radius);
+      border: 1px solid rgba(0,0,0,.12);
+      background: #0b0f14;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      position: relative;
+      min-height: 320px;
+    }
+    .device:before{
+      content:"";
+      position:absolute; inset:-80px -60px auto auto;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(10,132,255,.35), rgba(0,113,227,.0) 70%);
+      filter: blur(2px);
+      pointer-events:none;
+    }
+    .screen{
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 14px;
+      height: 100%;
+    }
+    .screen-top{
+      display:flex; align-items:center; justify-content:space-between;
+      color: rgba(255,255,255,.82);
+      font-size: 12px;
+      letter-spacing: .02em;
+    }
+    .dots{ display:flex; gap:6px; }
+    .dot{ width:8px; height:8px; border-radius: 99px; background: rgba(255,255,255,.18); }
+    .codebox{
+      margin-top: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: rgba(255,255,255,.86);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.26);
+      padding: 14px;
+      white-space: pre-wrap;
+    }
+    .shine{
+      position:absolute; inset:-2px;
+      background: radial-gradient(600px 220px at 30% -10%, rgba(255,255,255,.22), rgba(255,255,255,0) 60%);
+      pointer-events:none;
+      opacity: .7;
+    }
+
+    section{ padding: 26px 0; }
+    .section-title{
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin: 0 0 10px;
+    }
+    .section-sub{
+      margin:0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 78ch;
+    }
+
+    .features{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 920px){
+      .features{ grid-template-columns: 1fr; }
+    }
+    .feature{
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--hairline);
+      background: rgba(11,15,20,.02);
+      transition: transform .15s ease, background .15s ease;
+      min-height: 120px;
+    }
+    .feature:hover{ transform: translateY(-2px); background: rgba(11,15,20,.028); }
+    .feature b{ display:block; margin-bottom:6px; letter-spacing: -0.01em; }
+    .feature span{ color: var(--muted); line-height: 1.55; }
+
+    .timeline{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 980px){
+      .timeline{ grid-template-columns: 1fr; }
+    }
+    .day{
+      border-radius: 20px;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.7);
+      padding: 14px;
+    }
+    .day .d{ font-size: 12px; color: rgba(11,15,20,.62); margin-bottom: 6px; }
+    .day .t{ font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .day .c{ color: var(--muted); line-height: 1.55; font-size: 14px; }
+
+    .quote{
+      border-radius: 24px;
+      border: 1px solid var(--hairline);
+      background: linear-gradient(180deg, rgba(0,113,227,.08), rgba(11,15,20,.02));
+      padding: 18px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .quote p{ margin:0; line-height: 1.6; color: rgba(11,15,20,.78); }
+    .quote .by{ color: rgba(11,15,20,.62); font-size: 14px; }
+
+    .cta{
+      border-radius: 28px;
+      border: 1px solid var(--hairline);
+      background: radial-gradient(900px 240px at 20% 0%, rgba(0,113,227,.16), rgba(255,255,255,.0) 60%),
+                  linear-gradient(180deg, rgba(11,15,20,.03), rgba(11,15,20,.015));
+      padding: 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+    .cta h3{ margin:0; letter-spacing:-0.02em; }
+    .cta p{ margin:6px 0 0; color: var(--muted); }
+    footer{
+      padding: 26px 0 40px;
+      color: rgba(11,15,20,.55);
+      font-size: 13px;
+      border-top: 1px solid var(--hairline);
+      margin-top: 18px;
+    }
+
+    /* subtle entrance */
+    .reveal{ opacity:0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.on{ opacity:1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="#top" aria-label="Vibe Coding">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Vibe Coding</span>
+      </a>
+      <div class="nav-links" aria-label="navigation">
+        <a href="#features">특징</a>
+        <a href="#curriculum">5일 커리큘럼</a>
+        <a href="#showcase">결과물</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <a class="btn primary" href="#apply">참가 문의</a>
+    </div>
+  </div>
+
+  <main id="top" class="wrap">
+    <header class="hero">
+      <span class="kicker reveal">
+        <span class="kdot" aria-hidden="true"></span>
+        AI와 함께 “작은 제품”을 빠르게 만든다
+      </span>
+
+      <h1 class="reveal" style="transition-delay:.05s">
+        5일 동안, 아이디어를<br/>
+        실제 웹앱으로 바꿉니다.
+      </h1>
+
+      <p class="sub reveal" style="transition-delay:.1s">
+        Vibe Coding은 “코드의 문법”보다 먼저, <b>문제를 정의하고</b> <b>빠르게 구현</b>하고 <b>배포</b>하는 감각을 만듭니다.
+        결과물은 URL로 공유 가능한 미니 웹서비스가 됩니다.
+      </p>
+
+      <div class="hero-cta reveal" style="transition-delay:.15s">
+        <a class="btn primary" href="#apply">
+          <span class="icon" aria-hidden="true">🚀</span> 5일 완성반 신청
+        </a>
+        <a class="btn" href="#showcase">
+          <span class="icon" aria-hidden="true">🧩</span> 결과물 보기
+        </a>
+      </div>
+
+      <div class="meta reveal" style="transition-delay:.2s">
+        <span title="난이도">🧠 초급~중급 (선택형)</span>
+        <span title="형태">🖥️ 실습 중심</span>
+        <span title="산출물">🌐 배포 URL</span>
+        <span title="시간">⏱️ 하루 60~120분</span>
+      </div>
+
+      <div class="grid">
+        <div class="card reveal" style="transition-delay:.25s">
+          <h3>“Apple-ish”한 방식으로, 핵심만 남깁니다.</h3>
+          <p>
+            기능을 잔뜩 넣기보다, <b>사용자가 원하는 1가지</b>를 정확히 해결하는 제품을 만듭니다.
+            그 다음에 확장합니다. (이게 장기적으로 더 빠릅니다.)
+          </p>
+          <div class="pillrow" aria-label="highlights">
+            <span class="pill">1파일로 시작</span>
+            <span class="pill">모바일 우선</span>
+            <span class="pill">명확한 CTA</span>
+            <span class="pill">배포까지</span>
+            <span class="pill">피드백 루프</span>
+          </div>
+        </div>
+
+        <div class="device reveal" style="transition-delay:.3s" aria-label="preview">
+          <div class="shine" aria-hidden="true"></div>
+          <div class="screen">
+            <div class="screen-top">
+              <div class="dots" aria-hidden="true">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              </div>
+              <div>preview.app</div>
+            </div>
+            <div class="codebox" id="codebox"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="features">
+      <h2 class="section-title reveal">특징</h2>
+      <p class="section-sub reveal" style="transition-delay:.05s">
+        “배우고 끝”이 아니라 “만들고 남는 것”을 목표로 설계했습니다.
+      </p>
+
+      <div class="features">
+        <div class="feature reveal" style="transition-delay:.08s">
+          <b>명확한 문제 정의</b>
+          <span>기능 목록이 아니라, 사용자의 “한 문장 문제”부터 시작합니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.12s">
+          <b>AI 페어 프로그래밍</b>
+          <span>요구사항 → UI → 로직 → 디버깅까지, 질문법을 훈련합니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.16s">
+          <b>단단한 기본기</b>
+          <span>Frontend/Backend 개념을 “제품 구조”로 이해하도록 연결합니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.2s">
+          <b>모바일 우선 UX</b>
+          <span>학생/사용자가 휴대폰에서 바로 쓸 수 있는 화면부터 만듭니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.24s">
+          <b>배포 & 공유</b>
+          <span>GitHub Pages/Netlify 등으로 URL 배포까지 경험합니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.28s">
+          <b>확장 가능한 설계</b>
+          <span>작게 만들되, 다음 기능을 얹기 쉬운 구조로 마무리합니다.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="curriculum">
+      <h2 class="section-title reveal">5일 커리큘럼</h2>
+      <p class="section-sub reveal" style="transition-delay:.05s">
+        “완성”이 목표입니다. 매일 산출물이 남고, 마지막 날에는 발표 가능한 형태가 됩니다.
+      </p>
+
+      <div class="timeline">
+        <div class="day reveal" style="transition-delay:.08s">
+          <div class="d">Day 1</div>
+          <div class="t">문제 정의 & 화면 골격</div>
+          <div class="c">사용자·상황·핵심 행동(CTA)을 한 문장으로 정리하고, UI 뼈대를 만듭니다.</div>
+        </div>
+        <div class="day reveal" style="transition-delay:.12s">
+          <div class="d">Day 2</div>
+          <div class="t">기능 1개를 끝까지</div>
+          <div class="c">작게라도 “완결된 흐름”을 구현합니다. 입력→처리→출력.</div>
+        </div>
+        <div class="day reveal" style="transition-delay:.16s">
+          <div class="d">Day 3</div>
+          <div class="t">데이터 & 상태관리</div>
+          <div class="c">로컬스토리지/스프레드시트/API 중 하나로 데이터 흐름을 만들고 안정화합니다.</div>
+        </div>
+        <div class="day reveal" style="transition-delay:.2s">
+          <div class="d">Day 4</div>
+          <div class="t">디자인 정리 & 예외처리</div>
+          <div class="c">Apple-ish하게 “덜어내기”. 에러·빈값·엣지케이스를 다룹니다.</div>
+        </div>
+        <div class="day reveal" style="transition-delay:.24s">
+          <div class="d">Day 5</div>
+          <div class="t">배포 & 발표</div>
+          <div class="c">URL 배포 후, 2분 데모 + 1분 회고로 “다음 버전” 계획까지 세웁니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="showcase">
+      <h2 class="section-title reveal">결과물 예시</h2>
+      <p class="section-sub reveal" style="transition-delay:.05s">
+        아래는 “1주일 내 완성 가능한” 범위의 제품 예시입니다. (아이디어만 바꿔도 응용 폭이 큽니다.)
+      </p>
+
+      <div class="features">
+        <div class="quote reveal" style="transition-delay:.08s">
+          <p><b>수업용 미니 웹앱</b> — 타이머/퀴즈/워드카드/행맨 같은 도구를 “학생이 바로 쓰는” 형태로 배포.</p>
+          <div class="by">예: QR로 배포, 모바일 최적화, 점수 집계</div>
+        </div>
+        <div class="quote reveal" style="transition-delay:.12s">
+          <p><b>개인 포트폴리오 기능</b> — 작품(영상/수업자료/프로젝트)을 카드 형태로 정리하고 공유.</p>
+          <div class="by">예: GitHub/Netlify 배포, 섹션 구성, CTA 연결</div>
+        </div>
+        <div class="quote reveal" style="transition-delay:.16s">
+          <p><b>업무 자동화 도구</b> — 폼 입력 → 스프레드시트 저장 → 결과 페이지 생성까지 연결.</p>
+          <div class="by">예: Apps Script, 간단한 API, 데이터 검증</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2 class="section-title reveal">FAQ</h2>
+      <p class="section-sub reveal" style="transition-delay:.05s">
+        “시작이 늦었나?” 같은 질문은 흔합니다. 대부분은 설계와 반복의 문제입니다.
+      </p>
+
+      <div class="features">
+        <div class="feature reveal" style="transition-delay:.08s">
+          <b>코딩 초보도 가능하나요?</b>
+          <span>가능합니다. 다만 “완벽한 이해”보다 “완성 경험”을 먼저 가져갑니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.12s">
+          <b>Backend/Frontend를 꼭 알아야 하나요?</b>
+          <span>용어 암기보다 “데이터가 어디서 와서 어디로 가는지” 구조로 이해하면 됩니다.</span>
+        </div>
+        <div class="feature reveal" style="transition-delay:.16s">
+          <b>어떤 도구를 쓰나요?</b>
+          <span>기본은 HTML/CSS/JS + GitHub 배포. 필요하면 Apps Script/Sheets도 연결합니다.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="apply">
+      <div class="cta reveal">
+        <div>
+          <h3>지금, 5일 완성 프로젝트를 시작하세요.</h3>
+          <p>문의/신청 링크만 연결하면 바로 랜딩으로 사용 가능합니다.</p>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">신청 링크 연결</a>
+          <a class="btn" href="#top">맨 위로</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap" style="padding:0;">
+        <div>© <span id="year"></span> Vibe Coding. Minimal. Clear. Shippable.</div>
+        <div style="margin-top:8px;">
+          문구/일정/링크는 자유롭게 수정하세요. (특히 “신청 링크 연결” 버튼)
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // tiny typewriter for the preview
+    const lines = [
+`// Vibe Coding: ship small, ship real
+const idea = "학생이 바로 쓰는 미니 웹앱";
+const goal = "5일 안에 배포 가능한 형태";
+
+function build(idea){
+  return {
+    ui: "모바일 우선",
+    logic: "핵심 기능 1개 완결",
+    deploy: "URL 공유"
+  };
+}
+
+console.log(build(idea));`
+    ];
+    const el = document.getElementById("codebox");
+    let i = 0, j = 0;
+    function tick(){
+      const text = lines[i];
+      el.textContent = text.slice(0, j);
+      j++;
+      if (j <= text.length) requestAnimationFrame(tick);
+    }
+    tick();
+
+    // reveal on scroll
+    const io = new IntersectionObserver((entries)=>{
+      for (const e of entries){
+        if (e.isIntersecting) e.target.classList.add("on");
+      }
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach(n=>io.observe(n));
+
+    // year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
